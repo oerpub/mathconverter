@@ -18,3 +18,8 @@ pip install -r requirements.txt
 ```
 ./converter.py --help
 ```
+
+### Background information
+
+* `xsl_yarosh` by [Vasil Yaroshevich](http://www.raleigh.ru/MathML/mmltex/). Contains XSLT 1 transformation from MathML to LaTeX
+* `xsl_transpect` by [transpect.io](https://github.com/transpect/mml2tex). Contains XSLT 2 transformations from MathML to LaTeX (not used currently)
