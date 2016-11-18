@@ -12,6 +12,7 @@ output_formats = ['latex', 'mathml']
 
 
 def mathml2latex_yarosh(equation):
+    """ MathML to LaTeX conversion with XSLT from Vasil Yaroshevich """
     script_base_path = os.path.dirname(os.path.realpath(__file__))
     xslt_file = os.path.join(script_base_path, 'xsl_yarosh', 'mmltex.xsl')
     dom = etree.fromstring(equation)
@@ -22,6 +23,7 @@ def mathml2latex_yarosh(equation):
 
 
 def _call_mathml_cloud(equation, mathtype):
+    """ the HTTP POST to MathMLCloud server """
     try:
         resp = requests.post('https://api.mathmlcloud.org/equation',
                              {'math': equation, 'mathType': mathtype, 'mml': 'true', 'description': 'true'})
@@ -39,6 +41,7 @@ def _call_mathml_cloud(equation, mathtype):
 
 
 def asciilatex2mathml_cloud(equation, iformat):
+    """ Get MathML from MathMLCloud converter """
     #    resp = requests.post('https://api.mathmlcloud.org/equation',{'math': equation,'mathType':'TeX','mml':'true', 'svg':'true', 'png':'true', 'description':'true'})
     if iformat == 'asciimath':
         mathtype = 'AsciiMath'
