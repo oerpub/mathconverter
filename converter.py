@@ -2,15 +2,23 @@
 # -*- coding: utf-8 -*-
 
 import click
+import os
 import requests
 import sys
+from lxml import etree
 
 input_formats = ['asciimath', 'latex', 'mathml']
 output_formats = ['latex', 'mathml']
 
 
 def mathml2latex_yarosh(equation):
-    pass
+    script_base_path = os.path.dirname(os.path.realpath(__file__))
+    xslt_file = os.path.join(script_base_path, 'xsl_yarosh', 'mmltex.xsl')
+    dom = etree.fromstring(equation)
+    xslt = etree.parse(xslt_file)
+    transform = etree.XSLT(xslt)
+    newdom = transform(dom)
+    return unicode(newdom)
 
 
 def _call_mathml_cloud(equation, mathtype):
@@ -30,13 +38,15 @@ def _call_mathml_cloud(equation, mathtype):
         sys.exit(2)
 
 
-def mathmlcloud2mathml(equation, iformat):
+def asciilatex2mathml_cloud(equation, iformat):
     #    resp = requests.post('https://api.mathmlcloud.org/equation',{'math': equation,'mathType':'TeX','mml':'true', 'svg':'true', 'png':'true', 'description':'true'})
-    mathtype = 'TeX'
     if iformat == 'asciimath':
         mathtype = 'AsciiMath'
-    elif iformat == 'mathml':
-        mathtype = 'mml'
+    else:   # LaTeX
+        mathtype = 'TeX'
+    if iformat == 'mathml':
+        sys.stderr.write('ERROR: unexpected mathml usage. Should not happen')
+        sys.exit(3)
     # try x times to get MathML cloud result:
     for i in range(1, 5):
         # print "Attempt calling MathML Cloud Server: {}".format(i)
@@ -59,11 +69,16 @@ def convert(equation, iformat, oformat):
         sys.stderr.write(
             'Nothing to convert here. Input and output format are the same!')
         sys.exit(1)
+    result = 'Error: No result. Should not happen.'
     if (oformat == 'mathml'):
-        result = mathmlcloud2mathml(equation, iformat)
-        click.echo(result)
-    else:
-        print "t.b.a."
+        result = asciilatex2mathml_cloud(equation, iformat)
+    else:   # LaTeX
+        if (iformat == 'mathml'):
+            result = mathml2latex_yarosh(equation)
+        else:  # AsciiMath
+            mathml = asciilatex2mathml_cloud(equation, iformat)
+            result = mathml2latex_yarosh(mathml)
+    click.echo(result)
 
 
 if __name__ == '__main__':
