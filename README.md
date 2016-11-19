@@ -21,6 +21,21 @@ pip install -r requirements.txt
 ./converter.py --help
 ```
 
+### Example
+
+```
+$ ./converter.py --equation "x^2" --iformat asciimath --oformat mathml
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" alttext="x squared">
+  <mstyle displaystyle="true">
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math>
+```
+
 ### Background information
 
 * `xsl_yarosh` by [Vasil Yaroshevich](http://www.raleigh.ru/MathML/mmltex/). Contains XSLT 1 transformation from MathML to LaTeX
