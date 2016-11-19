@@ -38,7 +38,7 @@ $ ./converter.py --equation "x^2" --iformat asciimath --oformat mathml
 
 ## Known issues
 
-Don't use bash shell confusing/specific signs like e.g. `$$` or `"` in the commandline or escape them properly. If you're unsure how to do that run the command without `--equation` like this:
+Don't use bash shell confusing/specific signs like e.g. `$$` or `"` in the commandline or escape them properly. If you're unsure how to do that, run the command without `--equation` like this:
 
 ```
 $ ./converter.py --iformat asciimath --oformat mathml
