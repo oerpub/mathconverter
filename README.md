@@ -36,6 +36,16 @@ $ ./converter.py --equation "x^2" --iformat asciimath --oformat mathml
 </math>
 ```
 
+## Known issues
+
+Don't use bash shell confusing/specific signs like e.g. `$$` or `"` in the commandline or escape them properly. If you're unsure how to do that run the command without `--equation` like this:
+
+```
+$ ./converter.py --iformat asciimath --oformat mathml
+```
+
+it will prompt you for the equation that way.
+
 ### Background information
 
 * `xsl_yarosh` by [Vasil Yaroshevich](http://www.raleigh.ru/MathML/mmltex/). Contains XSLT 1 transformation from MathML to LaTeX
