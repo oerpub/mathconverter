@@ -2,6 +2,8 @@
 
 Converts from AsciiMath, LaTeX, MathML to LaTeX, MathML
 
+utilizes MathMLCloud (for MathML output) and XSL transforms (for LaTeX output).
+
 (Optional):
 ```
 virtualenv env
