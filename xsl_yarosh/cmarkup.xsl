@@ -5,7 +5,7 @@
 		version='1.0'>
                 
 <!-- ====================================================================== -->
-<!-- $id: tokens.xsl, 2002/22/11 Exp $
+<!-- $Id: cmarkup.xsl,v 1.8 2003/06/10 12:24:04 shade33 Exp $
      This file is part of the XSLT MathML Library distribution.
      See ./README or http://www.raleigh.ru/MathML/mmltex for
      copyright and other information                                        -->
@@ -108,10 +108,14 @@
 
 <!-- 4.4.2.9 lambda -->
 <xsl:template match="m:lambda">
+	<xsl:apply-templates select="m:bvar/*"/>
+  <xsl:text>\mapsto </xsl:text>
+  <xsl:apply-templates select="*[last()]"/>
+<!--	Other variant 
 	<xsl:text>\mathrm{lambda}\: </xsl:text>
   	<xsl:apply-templates select="m:bvar/*"/>
   	<xsl:text>.\: </xsl:text>
-  <xsl:apply-templates select="*[last()]"/>
+  <xsl:apply-templates select="*[last()]"/> -->
 </xsl:template>
 
 <!-- 4.4.2.10 compose -->
@@ -202,7 +206,7 @@
    <xsl:choose>
 		<xsl:when test="m:condition">
    		<xsl:apply-templates select="*[last()]"/>
-   		<xsl:text>, </xsl:text>
+   		<xsl:text>\mid </xsl:text>
 			<xsl:apply-templates select="m:condition/node()"/>
 		</xsl:when>
 		<xsl:otherwise>
@@ -374,7 +378,7 @@
 </xsl:template>
 
 <!-- 4.4.3.16 implies -->
-<xsl:template match="m:apply[*[1][self::m:implies]]">
+<xsl:template match="m:apply[*[1][self::m:implies]] | m:reln[*[1][self::m:implies]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="binary">
 		<xsl:with-param name="mo">\implies </xsl:with-param>
@@ -431,7 +435,7 @@
 </xsl:template>
 
 <!-- 4.4.4.1 eq -->
-<xsl:template match="m:apply[*[1][self::m:eq]]">
+<xsl:template match="m:apply[*[1][self::m:eq]] | m:reln[*[1][self::m:eq]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="1"/>
@@ -441,7 +445,7 @@
 </xsl:template>
 
 <!-- 4.4.4.2 neq -->
-<xsl:template match="m:apply[*[1][self::m:neq]]">
+<xsl:template match="m:apply[*[1][self::m:neq]] | m:reln[*[1][self::m:neq]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="1"/>
@@ -451,7 +455,7 @@
 </xsl:template>
 
 <!-- 4.4.4.3 gt -->
-<xsl:template match="m:apply[*[1][self::m:gt]]">
+<xsl:template match="m:apply[*[1][self::m:gt]] | m:reln[*[1][self::m:gt]]">
 <xsl:param name="p" select="0"/>
 <xsl:call-template name="infix">
 	<xsl:with-param name="this-p" select="1"/>
@@ -461,7 +465,7 @@
 </xsl:template>
 
 <!-- 4.4.4.4 lt -->
-<xsl:template match="m:apply[*[1][self::m:lt]]">
+<xsl:template match="m:apply[*[1][self::m:lt]] | m:reln[*[1][self::m:lt]]">
 <xsl:param name="p" select="0"/>
 <xsl:call-template name="infix">
 	<xsl:with-param name="this-p" select="1"/>
@@ -471,7 +475,7 @@
 </xsl:template>
 
 <!-- 4.4.4.5 geq -->
-<xsl:template match="m:apply[*[1][self::m:geq]]">
+<xsl:template match="m:apply[*[1][self::m:geq]] | m:reln[*[1][self::m:geq]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="1"/>
@@ -481,7 +485,7 @@
 </xsl:template>
 
 <!-- 4.4.4.6 leq -->
-<xsl:template match="m:apply[*[1][self::m:leq]]">
+<xsl:template match="m:apply[*[1][self::m:leq]] | m:reln[*[1][self::m:leq]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="1"/>
@@ -491,7 +495,7 @@
 </xsl:template>
 
 <!-- 4.4.4.7 equivalent -->
-<xsl:template match="m:apply[*[1][self::m:equivalent]]">
+<xsl:template match="m:apply[*[1][self::m:equivalent]] | m:reln[*[1][self::m:equivalent]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="1"/>
@@ -501,7 +505,7 @@
 </xsl:template>
 
 <!-- 4.4.4.8 approx -->
-<xsl:template match="m:apply[*[1][self::m:approx]]">
+<xsl:template match="m:apply[*[1][self::m:approx]] | m:reln[*[1][self::m:approx]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="1"/>
@@ -511,7 +515,7 @@
 </xsl:template>
 
 <!-- 4.4.4.9 factorof -->
-<xsl:template match="m:apply[*[1][self::m:factorof]]">
+<xsl:template match="m:apply[*[1][self::m:factorof]] | m:reln[*[1][self::m:factorof]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="binary">
 		<xsl:with-param name="mo"> | </xsl:with-param>
@@ -564,7 +568,6 @@
 			<xsl:apply-templates select="*[last()]"/>
 			<xsl:text>}{d </xsl:text>
 			<xsl:apply-templates select="m:bvar"/>
-			<xsl:text>}</xsl:text>
 		</xsl:otherwise>
 	</xsl:choose>
 	<xsl:text>}</xsl:text>
@@ -678,7 +681,7 @@
 </xsl:template>
 
 <!-- 4.4.6.5 in -->
-<xsl:template match="m:apply[*[1][self::m:in]]">
+<xsl:template match="m:apply[*[1][self::m:in]] | m:reln[*[1][self::m:in]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="binary">
 		<xsl:with-param name="mo">\in </xsl:with-param>
@@ -687,8 +690,8 @@
 	</xsl:call-template>
 </xsl:template>
 
-<!-- 4.4.6.5 notin -->
-<xsl:template match="m:apply[*[1][self::m:notin]]">
+<!-- 4.4.6.6 notin -->
+<xsl:template match="m:apply[*[1][self::m:notin]] | m:reln[*[1][self::m:notin]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="binary">
 		<xsl:with-param name="mo">\notin </xsl:with-param>
@@ -698,7 +701,7 @@
 </xsl:template>
 
 <!-- 4.4.6.7 subset -->
-<xsl:template match="m:apply[*[1][self::m:subset]]">
+<xsl:template match="m:apply[*[1][self::m:subset]] | m:reln[*[1][self::m:subset]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="2"/>
@@ -708,7 +711,7 @@
 </xsl:template>
 
 <!-- 4.4.6.8 prsubset -->
-<xsl:template match="m:apply[*[1][self::m:prsubset]]">
+<xsl:template match="m:apply[*[1][self::m:prsubset]] | m:reln[*[1][self::m:prsubset]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="2"/>
@@ -718,7 +721,7 @@
 </xsl:template>
 
 <!-- 4.4.6.9 notsubset -->
-<xsl:template match="m:apply[*[1][self::m:notsubset]]">
+<xsl:template match="m:apply[*[1][self::m:notsubset]] | m:reln[*[1][self::m:notsubset]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="binary">
 		<xsl:with-param name="this-p" select="2"/>
@@ -728,7 +731,7 @@
 </xsl:template>
 
 <!-- 4.4.6.10 notprsubset -->
-<xsl:template match="m:apply[*[1][self::m:notprsubset]]">
+<xsl:template match="m:apply[*[1][self::m:notprsubset]] | m:reln[*[1][self::m:notprsubset]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="binary">
 		<xsl:with-param name="this-p" select="2"/>
@@ -819,16 +822,16 @@ priority="2">
 </xsl:template>
 
 <!-- 4.4.7.4 tendsto -->
-<xsl:template match="m:apply[*[1][self::m:tendsto]]">
+<xsl:template match="m:apply[*[1][self::m:tendsto]] | m:reln[*[1][self::m:tendsto]]">
 	<xsl:param name="p"/>
 	<xsl:call-template name="binary">
 		<xsl:with-param name="this-p" select="2"/>
 		<xsl:with-param name="p" select="$p"/>
 		<xsl:with-param name="mo">
 			<xsl:choose>
-				<xsl:when test="@type='above'">\searrow </xsl:when>
-				<xsl:when test="@type='below'">\nearrow </xsl:when>
-				<xsl:when test="@type='two-sided'">\rightarrow </xsl:when>
+				<xsl:when test="*[1][@type='above']">\searrow </xsl:when>
+				<xsl:when test="*[1][@type='below']">\nearrow </xsl:when>
+				<xsl:when test="*[1][@type='two-sided']">\rightarrow </xsl:when>
 				<xsl:otherwise>\to </xsl:otherwise>
 			</xsl:choose>
 		</xsl:with-param>
@@ -983,7 +986,7 @@ priority="2">
 	<xsl:text>^T</xsl:text>
 </xsl:template>
 
-<!-- 4.4.10.5 selector -->
+<!-- 4.4.10.6 selector -->
 <xsl:template match="m:apply[*[1][self::m:selector]]">
 	<xsl:apply-templates select="*[2]">
 		<xsl:with-param name="p" select="7"/>
@@ -996,13 +999,23 @@ priority="2">
 	<xsl:text>}</xsl:text>
 </xsl:template>
 
-<!-- 4.4.10.7 scalarproduct 4.4.10.8 outerproduct -->
-<xsl:template match="m:apply[*[1][self::m:scalarproduct or self::m:outerproduct]]">
+<!-- 4.4.10.8 scalarproduct -->
+<xsl:template match="m:apply[*[1][self::m:scalarproduct]]">
 	<xsl:param name="p" select="0"/>
 	<xsl:call-template name="infix">
 		<xsl:with-param name="this-p" select="2"/>
 		<xsl:with-param name="p" select="$p"/>
-		<xsl:with-param name="mo">\dot </xsl:with-param>
+		<xsl:with-param name="mo">\cdot </xsl:with-param>
+	</xsl:call-template>
+</xsl:template>
+
+<!-- 4.4.10.9 outerproduct -->
+<xsl:template match="m:apply[*[1][self::m:outerproduct]]">
+	<xsl:param name="p" select="0"/>
+	<xsl:call-template name="infix">
+		<xsl:with-param name="this-p" select="2"/>
+		<xsl:with-param name="p" select="$p"/>
+		<xsl:with-param name="mo">\otimes </xsl:with-param>
 	</xsl:call-template>
 </xsl:template>
 

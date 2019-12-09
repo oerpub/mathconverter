@@ -4,27 +4,24 @@
                 version='1.0'>
 
 <!-- ====================================================================== -->
-<!-- $id: glayout.xsl, 2002/17/05 Exp $
+<!-- $Id: glayout.xsl,v 1.5 2003/06/10 12:24:04 shade33 Exp $
      This file is part of the XSLT MathML Library distribution.
      See ./README or http://www.raleigh.ru/MathML/mmltex for
      copyright and other information                                        -->
 <!-- ====================================================================== -->
 
+<!-- 3.3.2 mfrac -->
 <xsl:template match="m:mfrac">
 	<xsl:choose>
-		<xsl:when test="@bevelled='true'">
-<!--			<xsl:text>\raisebox{1ex}{</xsl:text>
-			<xsl:apply-templates select="./*[1]"/>
-			<xsl:text>}\!\left/ \!\raisebox{-1ex}{</xsl:text>
-			<xsl:apply-templates select="./*[2]"/>
-			<xsl:text>}\right.</xsl:text>-->
-		</xsl:when>
 		<xsl:when test="@linethickness">
 			<xsl:text>\genfrac{}{}{</xsl:text>
 			<xsl:choose>
 				<xsl:when test="number(@linethickness)">
 					<xsl:value-of select="@linethickness div 10"/>
 					<xsl:text>ex</xsl:text>
+				</xsl:when>
+				<xsl:when test="@linethickness='0'">
+					<xsl:text>0ex</xsl:text>
 				</xsl:when>
 				<xsl:when test="@linethickness='thin'">
 					<xsl:text>.05ex</xsl:text>
@@ -61,6 +58,15 @@
 	<xsl:text>}</xsl:text>
 </xsl:template>
 
+<xsl:template match="m:mfrac[@bevelled='true']">
+	<xsl:text>\raisebox{1ex}{$</xsl:text>
+	<xsl:apply-templates select="./*[1]"/>
+	<xsl:text>$}\!\left/ \!\raisebox{-1ex}{$</xsl:text>
+	<xsl:apply-templates select="./*[2]"/>
+	<xsl:text>$}\right.</xsl:text>
+</xsl:template>
+
+
 <xsl:template match="m:mroot">
 	<xsl:choose>
 		<xsl:when test="count(./*)=2">
@@ -93,18 +99,17 @@
 			<xsl:if test="@open='{' or @open='}'">
 				<xsl:text>\</xsl:text>
 			</xsl:if>
+			<xsl:if test="translate(@open,'{}[]()|','{{{{{{{')!='{' and (translate(@close,'{}[]()|','{{{{{{{')='{' or not(@close))">
+				<xsl:text>\left.</xsl:text>
+			</xsl:if>
 			<xsl:value-of select="@open"/>
 		</xsl:when>
 		<xsl:otherwise><xsl:text>\left(</xsl:text></xsl:otherwise>
 	</xsl:choose>
-	<xsl:choose>
-		<xsl:when test="count(./*)>1">
-			<xsl:variable name="symbol">
+			<xsl:variable name="sep">
 				<xsl:choose>
 					<xsl:when test="@separators">
-						<xsl:call-template name="startspace">
-							<xsl:with-param name="symbol" select="@separators"/>
-						</xsl:call-template>
+						<xsl:value-of select="translate(@separators,' ','')"/>
 					</xsl:when>
 					<xsl:otherwise>,</xsl:otherwise>
 				</xsl:choose>
@@ -113,28 +118,26 @@
 				<xsl:apply-templates select="."/>
 				<xsl:if test="not(position()=last())">
 					<xsl:choose>
-						<xsl:when test="position()>string-length($symbol)">
-							<xsl:value-of select="substring($symbol,string-length($symbol))"/>
+						<xsl:when test="position()>string-length($sep)">
+							<xsl:value-of select="substring($sep,string-length($sep))"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="substring($symbol,position(),1)"/>
+							<xsl:value-of select="substring($sep,position(),1)"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:apply-templates/>
-		</xsl:otherwise>
-	</xsl:choose>
 	<xsl:choose>
 		<xsl:when test="@close">
-			<xsl:if test="translate(@open,'{}[]()|','{{{{{{{')='{'">
+			<xsl:if test="translate(@close,'{}[]()|','{{{{{{{')='{'">
 				<xsl:text>\right</xsl:text>
 			</xsl:if>
-			<xsl:if test="@open='{' or @open='}'">
+			<xsl:if test="@close='{' or @close='}'">
 				<xsl:text>\</xsl:text>
-			</xsl:if>		
+			</xsl:if>
+			<xsl:if test="translate(@close,'{}[]()|','{{{{{{{')!='{' and (translate(@open,'{}[]()|','{{{{{{{')='{' or not(@open))">
+				<xsl:text>\right.</xsl:text>
+			</xsl:if>
 			<xsl:value-of select="@close"/>
 		</xsl:when>
 		<xsl:otherwise><xsl:text>\right)</xsl:text></xsl:otherwise>
@@ -172,6 +175,17 @@
 </xsl:template>
 
 <xsl:template match="m:mstyle">
+	<xsl:if test="@displaystyle='true'">
+		<xsl:text>{\displaystyle </xsl:text>
+	</xsl:if>
+	<xsl:if test="@scriptlevel and not(@displaystyle='true')">
+		<xsl:text>{</xsl:text>
+		<xsl:choose>
+			<xsl:when test="@scriptlevel=0"><xsl:text>\textstyle </xsl:text></xsl:when>
+			<xsl:when test="@scriptlevel=1"><xsl:text>\scriptstyle </xsl:text></xsl:when>
+			<xsl:otherwise><xsl:text>\scriptscriptstyle </xsl:text></xsl:otherwise> 
+		</xsl:choose> 
+	</xsl:if>	
 	<xsl:if test="@background">
 		<xsl:text>\colorbox[rgb]{</xsl:text>
 		<xsl:call-template name="color">
@@ -179,39 +193,27 @@
 		</xsl:call-template>
 		<xsl:text>}{$</xsl:text>
 	</xsl:if>
-	<xsl:if test="@color">
+	<xsl:if test="@color[not(@mathcolor)] or @mathcolor">
 		<xsl:text>\textcolor[rgb]{</xsl:text>
 		<xsl:call-template name="color">
-			<xsl:with-param name="color" select="@color"/>
+			<xsl:with-param name="color" select="@color|@mathcolor"/>
 		</xsl:call-template>
 		<xsl:text>}{</xsl:text>
 	</xsl:if>
 	<xsl:apply-templates/>
-	<xsl:if test="@color">
+	<xsl:if test="@color[not(@mathcolor)] or @mathcolor">
 		<xsl:text>}</xsl:text>
 	</xsl:if>
 	<xsl:if test="@background">
 		<xsl:text>$}</xsl:text>
 	</xsl:if>
-</xsl:template>
-<!--
-
-<xsl:template match="m:mstyle">
-	<xsl:if test="@displaystyle='true'">
-		<xsl:text>{\displaystyle</xsl:text>
-	</xsl:if>			
-	<xsl:if test="@scriptlevel=2">
-		<xsl:text>{\scriptscriptstyle</xsl:text>	
-	</xsl:if>
-	<xsl:apply-templates/>
-	<xsl:if test="@scriptlevel=2">
+	<xsl:if test="@scriptlevel and not(@displaystyle='true')">
 		<xsl:text>}</xsl:text>
-	</xsl:if>
+	</xsl:if>	
 	<xsl:if test="@displaystyle='true'">
 		<xsl:text>}</xsl:text>
 	</xsl:if>
 </xsl:template>
--->
 
 <xsl:template match="m:merror">
 	<xsl:apply-templates/>

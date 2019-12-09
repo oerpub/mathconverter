@@ -1,4 +1,4 @@
-README for the XSLT MathML Library
+README for the XSLT MathML Library 2.1.2
 
 XSLT MathML Library is a set of XSLT stylesheets to transform
 MathML 2.0 to LaTeX.
@@ -48,12 +48,12 @@ Obtaining The Library
 
 The XSLT MathML Library is available for download as:
 
-    * Zip file: http://www.raleigh.ru/MathML/mmltex/mmltex.zip
+    * Zip file: http://www.raleigh.ru/MathML/mmltex/xsltml_2.1.2.zip
 
 Copyright
 ---------
 
-Copyright (C) 2001, 2002 Vasil Yaroshevich
+Copyright (C) 2001-2003 Vasil Yaroshevich
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

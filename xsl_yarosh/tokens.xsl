@@ -4,7 +4,7 @@
                 version='1.0'>
                 
 <!-- ====================================================================== -->
-<!-- $id: tokens.xsl, 2002/22/11 Exp $
+<!-- $Id: tokens.xsl,v 1.7 2003/06/10 12:24:05 shade33 Exp $
      This file is part of the XSLT MathML Library distribution.
      See ./README or http://www.raleigh.ru/MathML/mmltex for
      copyright and other information                                        -->
@@ -12,6 +12,13 @@
 
 <xsl:template match="m:mi|m:mn|m:mo|m:mtext|m:ms">
 	<xsl:call-template name="CommonTokenAtr"/>
+</xsl:template>
+
+<!-- 3.2.9 mglyph -->
+<xsl:template match="m:mglyph">
+	<xsl:text>\textcolor{red}{</xsl:text>
+	<xsl:value-of select="@alt"/>
+	<xsl:text>}</xsl:text>
 </xsl:template>
 
 <xsl:template name="mi">
@@ -28,17 +35,37 @@
 </xsl:template>
 
 <xsl:template name="mn">
-	<xsl:apply-templates/>
+	<xsl:choose>
+		<xsl:when test="string(number(.))='NaN' and not(@mathvariant)">
+			<xsl:text>\mathrm{</xsl:text>
+				<xsl:apply-templates/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:apply-templates/>
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
+<!-- 3.2.5 Math Operator -->
 <xsl:template name="mo">
-	<xsl:apply-templates/>
+<xsl:if test="translate(normalize-space(.),'()[]}|','{{{{{{')='{'">
+		<xsl:choose>
+	<xsl:when test="not(@stretchy='false') and count(preceding-sibling::m:mo[translate(normalize-space(.),'()[]}|','{{{{{{')='{'])mod 2=0 and following-sibling::m:mo[1][not(@stretchy='false')][translate(normalize-space(.),'()[]}|','{{{{{{')='{']">
+			<xsl:text>\left</xsl:text>
+		</xsl:when>
+		<xsl:when test="not(@stretchy='false') and count(preceding-sibling::m:mo[translate(normalize-space(.),'()[]}|','{{{{{{')='{'])mod 2=1 and preceding-sibling::m:mo[1][not(@stretchy='false')][translate(normalize-space(.),'()[]}|','{{{{{{')='{']">
+			<xsl:text>\right</xsl:text>
+		</xsl:when>
+	</xsl:choose>
+</xsl:if>
+<xsl:apply-templates/>
 </xsl:template>
 
 <xsl:template name="mtext">
 	<xsl:variable name="content">
 		<xsl:call-template name="replaceMtextEntities">
-			<xsl:with-param name="content" select="."/>
+			<xsl:with-param name="content" select="normalize-space(.)"/>
 		</xsl:call-template>
 	</xsl:variable>
 	<xsl:text>\text{</xsl:text>
@@ -69,10 +96,10 @@
 <xsl:template name="ms">
 	<xsl:choose>
 		<xsl:when test="@lquote"><xsl:value-of select="@lquote"/></xsl:when>
-		<xsl:otherwise><xsl:text>"</xsl:text></xsl:otherwise>
+		<xsl:otherwise><xsl:text>''</xsl:text></xsl:otherwise>
 	</xsl:choose><xsl:apply-templates/><xsl:choose>
 		<xsl:when test="@rquote"><xsl:value-of select="@rquote"/></xsl:when>
-		<xsl:otherwise><xsl:text>"</xsl:text></xsl:otherwise>
+		<xsl:otherwise><xsl:text>''</xsl:text></xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
 
@@ -84,7 +111,7 @@
 		</xsl:call-template>
 		<xsl:text>}{$</xsl:text>
 	</xsl:if>
-	<xsl:if test="@color or @mathcolor"> <!-- Note: @color is deprecated in MathML 2.0 -->
+	<xsl:if test="@color[not(@mathcolor)] or @mathcolor"> <!-- Note: @color is deprecated in MathML 2.0 -->
 		<xsl:text>\textcolor[rgb]{</xsl:text>
 		<xsl:call-template name="color">
 			<xsl:with-param name="color" select="@color|@mathcolor"/>
@@ -102,20 +129,23 @@
 			<xsl:when test="@mathvariant='italic'">
 				<xsl:text>\mathit{</xsl:text>
 			</xsl:when>
-			<xsl:when test="@mathvariant='bold-italic'">	<!-- Required definition -->
-				<xsl:text>\mathbit{</xsl:text>
+			<xsl:when test="@mathvariant='bold-italic'"> <!-- not supported -->
+				<xsl:text>\mathit{</xsl:text>
+				<xsl:message>The value bold-italic for mathvariant is not supported</xsl:message>
 			</xsl:when>
 			<xsl:when test="@mathvariant='double-struck'">	<!-- Required amsfonts -->
 				<xsl:text>\mathbb{</xsl:text>
 			</xsl:when>
-			<xsl:when test="@mathvariant='bold-fraktur'">	<!-- Error -->
-				<xsl:text>{</xsl:text>
+			<xsl:when test="@mathvariant='bold-fraktur'"> <!-- not supported -->
+				<xsl:text>\mathfrak{</xsl:text>
+				<xsl:message>The value bold-fraktur for mathvariant is not supported</xsl:message>
 			</xsl:when>
 			<xsl:when test="@mathvariant='script'">
 				<xsl:text>\mathcal{</xsl:text>
 			</xsl:when>
-			<xsl:when test="@mathvariant='bold-script'">	<!-- Error -->
-				<xsl:text>\mathsc{</xsl:text>
+			<xsl:when test="@mathvariant='bold-script'"> <!-- not supported -->
+				<xsl:text>\mathcal{</xsl:text>
+				<xsl:message>The value bold-script for mathvariant is not supported</xsl:message>
 			</xsl:when>
 			<xsl:when test="@mathvariant='fraktur'">	<!-- Required amsfonts -->
 				<xsl:text>\mathfrak{</xsl:text>
@@ -123,20 +153,24 @@
 			<xsl:when test="@mathvariant='sans-serif'">
 				<xsl:text>\mathsf{</xsl:text>
 			</xsl:when>
-			<xsl:when test="@mathvariant='bold-sans-serif'"> <!-- Required definition -->
-				<xsl:text>\mathbsf{</xsl:text>
+			<xsl:when test="@mathvariant='bold-sans-serif'"> <!-- not supported -->
+				<xsl:text>\mathsf{</xsl:text>
+				<xsl:message>The value bold-sans-serif for mathvariant is not supported</xsl:message>
 			</xsl:when>
-			<xsl:when test="@mathvariant='sans-serif-italic'"> <!-- Required definition -->
-				<xsl:text>\mathsfit{</xsl:text>
+			<xsl:when test="@mathvariant='sans-serif-italic'"> <!-- not supported -->
+				<xsl:text>\mathsf{</xsl:text>
+				<xsl:message>The value sans-serif-italic for mathvariant is not supported</xsl:message>
 			</xsl:when>
-			<xsl:when test="@mathvariant='sans-serif-bold-italic'">	<!-- Error -->
-				<xsl:text>\mathbsfit{</xsl:text>
+			<xsl:when test="@mathvariant='sans-serif-bold-italic'"> <!-- not supported -->
+				<xsl:text>\mathsf{</xsl:text>
+				<xsl:message>The value sans-serif-bold-italic for mathvariant is not supported</xsl:message>
 			</xsl:when>
 			<xsl:when test="@mathvariant='monospace'">
 				<xsl:text>\mathtt{</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text>{</xsl:text>
+				<xsl:message>Error at mathvariant attribute</xsl:message>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:if>
@@ -153,8 +187,6 @@
 </xsl:template>
 
 <xsl:template name="selectTemplate">
-<!--	<xsl:variable name="name" select="local-name()"/>
-	<xsl:call-template name="{$name}"/>-->
 	<xsl:choose>
 		<xsl:when test="local-name(.)='mi'">
 			<xsl:call-template name="mi"/>

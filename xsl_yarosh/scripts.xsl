@@ -4,29 +4,16 @@
                 version='1.0'>
                 
 <!-- ====================================================================== -->
-<!-- $Id: scripts.xsl,v 1.1.1.1 2002/10/26 14:20:06 shade33 Exp $
+<!-- $Id: scripts.xsl,v 1.4 2003/06/10 12:24:04 shade33 Exp $
      This file is part of the XSLT MathML Library distribution.
      See ./README or http://www.raleigh.ru/MathML/mmltex for
      copyright and other information                                        -->
 <!-- ====================================================================== -->
 
 <xsl:template match="m:munderover">
-	<xsl:variable name="base">
-		<xsl:call-template name="startspace">
-			<xsl:with-param name="symbol" select="./*[1]"/>
-		</xsl:call-template>
-	</xsl:variable>
-	<xsl:variable name="under">
-		<xsl:call-template name="startspace">
-			<xsl:with-param name="symbol" select="./*[2]"/>
-		</xsl:call-template>
-	</xsl:variable>
-	<xsl:variable name="over">
-		<xsl:call-template name="startspace">
-			<xsl:with-param name="symbol" select="./*[3]"/>
-		</xsl:call-template>
-	</xsl:variable>
-	
+	<xsl:variable name="base" select="translate(./*[1],' ','')"/>
+	<xsl:variable name="under" select="translate(./*[2],' ','')"/>
+	<xsl:variable name="over" select="translate(./*[3],' ','')"/>
 	<xsl:choose>
 		<xsl:when test="$over='&#x000AF;'">	<!-- OverBar - over bar -->
 			<xsl:text>\overline{</xsl:text>
@@ -38,6 +25,30 @@
 		</xsl:when>
 		<xsl:when test="$over='&#x0FE37;'">	<!-- OverBrace - over brace -->
 			<xsl:text>\overbrace{</xsl:text>
+			<xsl:call-template name="munder">
+				<xsl:with-param name="base" select="$base"/>
+				<xsl:with-param name="under" select="$under"/>
+			</xsl:call-template>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x02190;'">	<!--/leftarrow /gets A: =leftward arrow -->
+			<xsl:text>\overleftarrow{</xsl:text>
+			<xsl:call-template name="munder">
+				<xsl:with-param name="base" select="$base"/>
+				<xsl:with-param name="under" select="$under"/>
+			</xsl:call-template>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x02192;'">	<!--/rightarrow /to A: =rightward arrow -->
+			<xsl:text>\overrightarrow{</xsl:text>
+			<xsl:call-template name="munder">
+				<xsl:with-param name="base" select="$base"/>
+				<xsl:with-param name="under" select="$under"/>
+			</xsl:call-template>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x02194;'">	<!--/leftrightarrow A: l&r arrow -->
+			<xsl:text>\overleftrightarrow{</xsl:text>
 			<xsl:call-template name="munder">
 				<xsl:with-param name="base" select="$base"/>
 				<xsl:with-param name="under" select="$under"/>
@@ -62,6 +73,33 @@
 			</xsl:call-template>
 			<xsl:text>}</xsl:text>
 		</xsl:when>
+		<xsl:when test="$under='&#x02190;'">	<!--/leftarrow /gets A: =leftward arrow -->
+			<xsl:text>\underleftarrow{</xsl:text>
+			<xsl:call-template name="mover">
+				<xsl:with-param name="base" select="$base"/>
+				<xsl:with-param name="over" select="$over"/>
+				<xsl:with-param name="pos_over" select="3"/>
+			</xsl:call-template>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$under='&#x02192;'">	<!--/rightarrow /to A: =rightward arrow -->
+			<xsl:text>\underrightarrow{</xsl:text>
+			<xsl:call-template name="mover">
+				<xsl:with-param name="base" select="$base"/>
+				<xsl:with-param name="over" select="$over"/>
+				<xsl:with-param name="pos_over" select="3"/>
+			</xsl:call-template>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$under='&#x02194;'">	<!--/leftrightarrow A: l&r arrow -->
+			<xsl:text>\underleftrightarrow{</xsl:text>
+			<xsl:call-template name="mover">
+				<xsl:with-param name="base" select="$base"/>
+				<xsl:with-param name="over" select="$over"/>
+				<xsl:with-param name="pos_over" select="3"/>
+			</xsl:call-template>
+			<xsl:text>}</xsl:text>
+		</xsl:when>		
 		<xsl:when test="translate($base,'&#x0220F;&#x02210;&#x022c2;&#x022c3;&#x02294;',
 						'&#x02211;&#x02211;&#x02211;&#x02211;&#x02211;')='&#x02211;'">
 <!-- if $base is operator, such as
@@ -93,31 +131,15 @@
 
 <xsl:template match="m:mover">
 	<xsl:call-template name="mover">
-		<xsl:with-param name="base">
-			<xsl:call-template name="startspace">
-				<xsl:with-param name="symbol" select="./*[1]"/>
-			</xsl:call-template>
-		</xsl:with-param>
-		<xsl:with-param name="over">
-			<xsl:call-template name="startspace">
-				<xsl:with-param name="symbol" select="./*[2]"/>
-			</xsl:call-template>
-		</xsl:with-param>
+		<xsl:with-param name="base" select="translate(./*[1],' ','')"/>
+		<xsl:with-param name="over" select="translate(./*[2],' ','')"/>
 	</xsl:call-template>
 </xsl:template>
 
 <xsl:template match="m:munder">
 	<xsl:call-template name="munder">
-		<xsl:with-param name="base">
-			<xsl:call-template name="startspace">
-				<xsl:with-param name="symbol" select="./*[1]"/>
-			</xsl:call-template>
-		</xsl:with-param>
-		<xsl:with-param name="under">
-			<xsl:call-template name="startspace">
-				<xsl:with-param name="symbol" select="./*[2]"/>
-			</xsl:call-template>
-		</xsl:with-param>
+		<xsl:with-param name="base" select="translate(./*[1],' ','')"/>
+		<xsl:with-param name="under" select="translate(./*[2],' ','')"/>
 	</xsl:call-template>
 </xsl:template>
 
@@ -135,6 +157,52 @@
 			<xsl:text>\overbrace{</xsl:text>
 			<xsl:apply-templates select="./*[1]"/>
 			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x02190;'">	<!--/leftarrow /gets A: =leftward arrow -->
+			<xsl:text>\overleftarrow{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x02192;'">	<!--/rightarrow /to A: =rightward arrow -->
+			<xsl:text>\overrightarrow{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x02194;'">	<!--/leftrightarrow A: l&r arrow -->
+			<xsl:text>\overleftrightarrow{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x002DC;'">	<!-- small tilde -->
+			<xsl:text>\tilde{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x02713;'">	<!-- /checkmark =tick, check mark -->
+			<xsl:text>\check{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+			<xsl:when test="$over='&#x002D9;'">	<!-- dot above -->
+			<xsl:text>\dot{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$over='&#x000A8;'">	<!-- DoubleDot - dieresis or umlaut mark -->
+			<xsl:text>\ddot{</xsl:text>
+ 			<xsl:apply-templates select="./*[1]"/>
+ 			<xsl:text>}</xsl:text>
+ 		</xsl:when>
+		<xsl:when test="$over='&#x00302;' or $over='&#x0005E;'"> <!-- Hat or circ - circumflex accent -->
+			<xsl:choose>
+				<xsl:when test="@accent='true'">
+					<xsl:text>\widehat{</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>\hat{</xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:apply-templates select="./*[1]"/><xsl:text>}</xsl:text>
 		</xsl:when>
 		<xsl:when test="translate($base,'&#x0220F;&#x02210;&#x022c2;&#x022c3;&#x02294;',
 						'&#x02211;&#x02211;&#x02211;&#x02211;&#x02211;')='&#x02211;'">
@@ -178,6 +246,21 @@
 		</xsl:when>
 		<xsl:when test="$under='&#x0FE38;'">	<!-- UnderBrace - under brace -->
 			<xsl:text>\underbrace{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$under='&#x02190;'">	<!--/leftarrow /gets A: =leftward arrow -->
+			<xsl:text>\underleftarrow{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$under='&#x02192;'">	<!--/rightarrow /to A: =rightward arrow -->
+			<xsl:text>\underrightarrow{</xsl:text>
+			<xsl:apply-templates select="./*[1]"/>
+			<xsl:text>}</xsl:text>
+		</xsl:when>
+		<xsl:when test="$under='&#x02194;'">	<!--/leftrightarrow A: l&r arrow -->
+			<xsl:text>\underleftrightarrow{</xsl:text>
 			<xsl:apply-templates select="./*[1]"/>
 			<xsl:text>}</xsl:text>
 		</xsl:when>
